@@ -32,13 +32,28 @@ const run = async () => {
       const dishes = await cursor.toArray();
       res.send(dishes);
     });
+    //get all all review form mongodb
+    app.get("/reviews", async (req, res) => {
+      const query = {};
+      const cursor = reviewCollection.find(query);
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    });
 
     //single post request
     app.post("/dishes", async (req, res) => {
-      const dish = req.body;
-      const result = await dishCollection.insertOne(dish);
+      const singleDish = req.body;
+      const result = await dishCollection.insertOne(singleDish);
       res.send(result);
     });
+
+    // single review post
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
+
     //single query by id
 
     app.get("/dishes/:id", async (req, res) => {
