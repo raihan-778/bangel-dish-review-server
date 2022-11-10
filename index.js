@@ -86,8 +86,9 @@ const run = async () => {
     });
 
     app.get("/homeDishes", async (req, res) => {
+      const sort = { length: 3 };
       const query = {};
-      const cursor = dishCollection.find(query).limit(3);
+      const cursor = dishCollection.find(query).sort(sort).limit(3);
       const homeDishes = await cursor.toArray();
       res.send(homeDishes);
     });
