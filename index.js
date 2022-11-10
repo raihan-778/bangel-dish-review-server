@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
+var jwt = require("jsonwebtoken");
 const port = process.env.PORT || 5000;
 
 require("dotenv").config();
@@ -25,10 +26,21 @@ const run = async () => {
     const dishCollection = client.db("bengleDishDb").collection("services");
     const reviewCollection = client.db("bengleDishDb").collection("reviews");
 
+    // api for jwt token generation
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      // console.log(user);
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h",
+      });
+      res.send({ token });
+    });
+
     //get all data form mongodb
     app.get("/dishes", async (req, res) => {
       const query = {};
-      const cursor = dishCollection.find(query);
+      const sort = { length: -1 };
+      const cursor = dishCollection.find(query).sort(sort);
       const dishes = await cursor.toArray();
       res.send(dishes);
     });
@@ -43,7 +55,8 @@ const run = async () => {
     //get all review form mongodb
     app.get("/reviews", async (req, res) => {
       const query = {};
-      const cursor = reviewCollection.find(query);
+      const date = -1;
+      const cursor = reviewCollection.find(query).sort(date);
       const reviews = await cursor.toArray();
       res.send(reviews);
     });
@@ -86,11 +99,16 @@ const run = async () => {
     });
 
     app.get("/homeDishes", async (req, res) => {
-      const sort = { length: 3 };
+      const sort = { length: -1 };
       const query = {};
-      const cursor = dishCollection.find(query).sort(sort).limit(3);
+      const cursor = dishCollection.find(query).limit(3).sort(sort);
       const homeDishes = await cursor.toArray();
       res.send(homeDishes);
+    });
+    app.post("/homeDishes", async (req, res) => {
+      const singleDish = req.body;
+      const result = await dishCollection.insertOne(singleDish);
+      res.send(result);
     });
   } finally {
   }
