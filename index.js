@@ -32,6 +32,14 @@ const run = async () => {
       const dishes = await cursor.toArray();
       res.send(dishes);
     });
+
+    //single post request
+    app.post("/dishes", async (req, res) => {
+      const singleDish = req.body;
+      const result = await dishCollection.insertOne(singleDish);
+      res.send(result);
+    });
+
     //get all review form mongodb
     app.get("/reviews", async (req, res) => {
       const query = {};
@@ -54,13 +62,6 @@ const run = async () => {
       res.send(reviews);
     });
 
-    //single post request
-    app.post("/dishes", async (req, res) => {
-      const singleDish = req.body;
-      const result = await dishCollection.insertOne(singleDish);
-      res.send(result);
-    });
-
     // single review post
     app.post("/reviews", async (req, res) => {
       const review = req.body;
@@ -68,6 +69,13 @@ const run = async () => {
       res.send(result);
     });
 
+    // delete review
+    app.delete("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await reviewCollection.deleteOne(query);
+      res.send(result);
+    });
     //single query by id
 
     app.get("/dishes/:id", async (req, res) => {
