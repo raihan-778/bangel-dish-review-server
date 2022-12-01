@@ -2,17 +2,19 @@ const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 const port = process.env.PORT || 5000;
 
 require("dotenv").config();
 
 //middleware
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 //mongodb conntection setup
+
+//pas:vaAxMey0smDNg7M1
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.SECRET_KEY}@cluster0.jz1qjld.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -27,14 +29,14 @@ const run = async () => {
     const reviewCollection = client.db("bengleDishDb").collection("reviews");
 
     // api for jwt token generation
-    app.post("/jwt", (req, res) => {
+    /*     app.post("/jwt", (req, res) => {
       const user = req.body;
       // console.log(user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "1h",
       });
       res.send({ token });
-    });
+    }); */
 
     //get all data form mongodb
     app.get("/dishes", async (req, res) => {
@@ -55,9 +57,7 @@ const run = async () => {
     //get all review form mongodb
     app.get("/reviews", async (req, res) => {
       const query = {};
-      const date = -1;
-      const cursor = reviewCollection.find(query).sort(date);
-      const reviews = await cursor.toArray();
+      const reviews = await reviewCollection.find(query).toArray();
       res.send(reviews);
     });
 
@@ -72,6 +72,7 @@ const run = async () => {
       }
       const cursor = reviewCollection.find(query);
       const reviews = await cursor.toArray();
+      console.log(reviews);
       res.send(reviews);
     });
 
@@ -130,10 +131,6 @@ const run = async () => {
   }
 };
 run().catch((err) => console.error(err));
-
-//middleware
-app.use(cors());
-app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send(`Service review server is running`);
